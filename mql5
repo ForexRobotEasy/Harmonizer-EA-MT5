@@ -1,0 +1,71 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                  Harmonizer EA MT5|
+//|                                      https://www.forexroboteasy.com|
+//|                                         Developed by Forex Robot Easy Team|
+//+------------------------------------------------------------------+
+
+// Global Variables
+input double LotSize = 0.01; // Default lot size
+input double GridDistance = 20; // Distance between grid levels
+input double TakeProfit = 100; // Take profit level
+input double StopLoss = 50; // Stop loss level
+input double MaxPositions = 5; // Maximum number of open positions
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Set initial parameters and account information
+    Print('Harmonizer EA MT5 initialized.');
+    
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Perform any necessary cleanup operations
+    Print('Harmonizer EA MT5 deinitialized.');
+}
+
+//+------------------------------------------------------------------+
+//| Expert start function                                            |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Check for available positions and calculate entry positions
+    int totalPositions = PositionsTotal();
+    if(totalPositions < MaxPositions)
+    {
+        double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+        double gridLevel = MathFloor(currentPrice / GridDistance) * GridDistance;
+        
+        // Place pending orders at calculated grid levels
+        for(int i = 0; i < MaxPositions - totalPositions; i++)
+        {
+            double entryPrice = gridLevel + (i + 1) * GridDistance;
+            double stopLossLevel = entryPrice - StopLoss;
+            double takeProfitLevel = entryPrice + TakeProfit;
+            
+            // Place pending order with calculated levels
+            int ticket = OrderSend(_Symbol, OP_BUYLIMIT, LotSize, entryPrice, 0, stopLossLevel, takeProfitLevel);
+            if(ticket > 0)
+                Print('Pending order placed at: ', entryPrice);
+            else
+                Print('Failed to place pending order.');
+        }
+    }
+    
+    // Adjust positions based on market changes
+    
+    // Check for news filter
+    
+    // Perform necessary trades and risk management
+    
+    // Print trading information
+    Print('Harmonizer EA MT5 ticked.');
+}
